@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alma Life</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#121426;color:#fff;font-family:Arial,sans-serif}
+main{max-width:600px;margin:auto;padding:18px}
+header{padding:24px;border-radius:22px;background:linear-gradient(135deg,#7345ed,#e44fa4)}
+h1{margin:5px 0;font-size:30px}
+.card{background:#20243a;padding:16px;border-radius:17px;margin-top:14px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.stat{background:#15192b;padding:12px;border-radius:12px}
+.stat strong{display:block;font-size:19px;margin-top:7px}
+button,input{font:inherit}
+button{background:#8657f5;color:white;border:0;border-radius:11px;padding:12px;cursor:pointer}
+input{width:100%;padding:12px;margin:10px 0;border-radius:10px;border:0}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.actions button{text-align:left;min-height:65px}
+small{opacity:.8}
+.log{padding:9px 0;border-bottom:1px solid #383b50;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+<header>
+<small>SIMULASI KEHIDUPAN</small>
+<h1>🌆 Alma Life</h1>
+<p>Mulai dari nol. Bangun kehidupan impianmu!</p>
+<div id="start">
+<input id="nama" placeholder="Nama karakter kamu" maxlength="20">
+<button onclick="mulai()">Mulai perjalanan ✨</button>
+</div>
+<div id="welcome"></div>
+</header>
+
+<section class="card stats">
+<div class="stat">💰 Uang<strong id="uang">Rp150.000</strong></div>
+<div class="stat">⚡ Energi<strong id="energi">100/100</strong></div>
+<div class="stat">😊 Bahagia<strong id="bahagia">70/100</strong></div>
+<div class="stat">📅 Hari ke<strong id="hari">1</strong></div>
+</section>
+
+<section class="card">
+<h3>📖 Cerita hari ini</h3>
+<p id="cerita">Kamu tiba di kota baru. Masa depanmu dimulai dari sini.</p>
+</section>
+
+<section class="card">
+<h3>💼 Apa yang ingin kamu lakukan?</h3>
+<div class="actions">
+<button onclick="aksi('kerja')">🧑‍💻 Kerja harian<small><br> Dapat uang</small></button>
+<button onclick="aksi('bisnis')">🧋 Buka jualan<small><br> Bangun usaha</small></button>
+<button onclick="aksi('belajar')">📚 Belajar skill<small><br> Tingkatkan kemampuan</small></button>
+<button onclick="aksi('istirahat')">🌿 Istirahat<small><br> Pulihkan energi</small></button>
+<button onclick="aksi('teman')">🤝 Cari relasi<small><br> Buka peluang</small></button>
+<button onclick="aksi('kejutan')">🎲 Cari tantangan<small><br> Hadapi kejutan</small></button>
+</div>
+</section>
+
+<section class="card">
+<h3>🏡 Impianmu</h3>
+<p id="impian">Rumah sendiri: Rp2.000.000</p>
+<button onclick="beliRumah()">Beli rumah 🏡</button>
+<p id="kendaraan">Kendaraan: Rp750.000</p>
+<button onclick="beliKendaraan()">Beli kendaraan 🛵</button>
+</section>
+
+<section class="card">
+<h3>📔 Buku perjalanan</h3>
+<div id="catatan">Perjalananmu akan tercatat di sini.</div>
+</section>
+
+<section class="card">
+<button onclick="simpan()">💾 Simpan permainan</button>
+<button onclick="ulang()">Mulai ulang</button>
+<p><small>Progres tersimpan di browser perangkat ini.</small></p>
+</section>
+</main>
+<script>
+let s={nama:"",uang:150000,energi:100,bahagia:70,hari:1,skill:0,relasi:0,usaha:0,rumah:false,kendaraan:false,log:[],mulai:false};
+const el=id=>document.getElementById(id);
+const rp=n=>"Rp"+Math.floor(n).toLocaleString("id-ID");
+function mulai(){
+ let n=el("nama").value.trim();
+ if(!n){alert("Masukkan nama karakter dulu!");return}
+ s.nama=n;s.mulai=true;
+ el("start").style.display="none";
+ el("welcome").textContent="Halo, "+n+"! Ini kisah hidupmu.";
+ catat("🌅 Kamu memulai kehidupan baru di kota.");
+ tampil();simpan()
+}
+function cerita(t){el("cerita").textContent=t}
+function catat(t){s.log.unshift("Hari "+s.hari+": "+t);s.log=s.log.slice(0,10);cerita(t)}
+function aksi(a){
+ if(!s.mulai){alert("Mulai perjalanan dulu!");return}
+ if(a!=="istirahat"&&s.energi<15){cerita("Energi kamu habis. Istirahat dulu, ya.");return}
+ let t="";
+ if(a==="kerja"){
+ let g=40000+s.skill*10000+Math.floor(Math.random()*20001);
+ s.uang+=g;s.energi-=20;s.bahagia-=3;
+ t="Kamu bekerja hari ini dan mendapat "+rp(g)+". Selangkah lebih dekat menuju impian!";
+ }
+ if(a==="bisnis"){
+ if(s.uang<50000){cerita("Modal jualan membutuhkan Rp50.000. Kumpulkan uang dulu!");return}
+ s.uang-=50000;
+ let g=35000+Math.floor(Math.random()*100001)+s.skill*5000+s.relasi*2000;
+ s.uang+=g;s.energi-=20;s.bahagia+=4;s.usaha++;
+ t="Jualanmu menghasilkan pemasukan "+rp(g)+". Kamu sudah mencoba usaha sebanyak "+s.usaha+" kali!";
+ }
+ if(a==="belajar"){
+ if(s.uang<20000){cerita("Kamu perlu Rp20.000 untuk belajar.");return}
+ s.uang-=20000;s.skill++;s.energi-=12;
+ t="Skill meningkat ke level "+s.skill+". Kemampuan baru bisa membantumu mendapat penghasilan lebih besar.";
+ }
+ if(a==="istirahat"){
+ s.energi=Math.min(100,s.energi+35);s.bahagia=Math.min(100,s.bahagia+10);
+ t="Kamu mengambil waktu untuk diri sendiri. Energi dan semangatmu kembali.";
+ }
+ if(a==="teman"){
+ s.uang-=10000;s.relasi++;s.energi-=10;s.bahagia=Math.min(100,s.bahagia+5);
+ t="Kamu berkenalan dengan orang baru. Relasi bisa membuka peluang bisnis!";
+ }
+ if(a==="kejutan"){
+ s.energi-=10;
+ let r=Math.random();
+ if(r<.35){let g=50000+Math.floor(Math.random()*50001);s.uang+=g;t="🎉 Kejutan! Seseorang menawarkan pekerjaan kecil. Kamu mendapat "+rp(g)+"."}
+ else if(r<.65){s.uang=Math.max(0,s.uang-25000);t="😵 Ada pengeluaran mendadak Rp25.000. Saatnya lebih cermat mengatur uang."}
+ else{s.bahagia=Math.min(100,s.bahagia+10);s.skill++;t="🌟 Kamu mendapat inspirasi baru! Skill naik dan semangatmu bertambah."}
+ }
+ s.energi=Math.max(0,Math.min(100,s.energi));
+ s.bahagia=Math.max(0,Math.min(100,s.bahagia));
+ s.hari++;
+ if(s.hari%5===0){s.uang=Math.max(0,s.uang-15000);t+=" Pengeluaran rutin Rp15.000."}
+ catat(t);tampil();simpan()
+}
+function beliRumah(){
+ if(!s.mulai)return alert("Mulai perjalanan dulu!");
+ if(s.rumah)return cerita("Kamu sudah punya rumah sendiri! 🏡");
+ if(s.uang<2000000)return cerita("Uangmu belum cukup. Rumah membutuhkan Rp2.000.000.");
+ s.uang-=2000000;s.rumah=true;s.bahagia=Math.min(100,s.bahagia+15);
+ catat("🏡 Kamu membeli rumah sendiri! Salah satu impianmu tercapai.");tampil();simpan()
+}
+function beliKendaraan(){
+ if(!s.mulai)return alert("Mulai perjalanan dulu!");
+ if(s.kendaraan)return cerita("Kamu sudah memiliki kendaraan! 🛵");
+ if(s.uang<750000)return cerita("Kendaraan membutuhkan Rp750.000. Terus kumpulkan uang!");
+ s.uang-=750000;s.kendaraan=true;
+ catat("🛵 Kamu membeli kendaraan untuk memudahkan aktivitasmu.");tampil();simpan()
+}
+function tampil(){
+ el("uang").textContent=rp(s.uang);
+ el("energi").textContent=s.energi+"/100";
+ el("bahagia").textContent=s.bahagia+"/100";
+ el("hari").textContent=s.hari;
+ el("impian").textContent="Rumah sendiri: "+(s.rumah?"TERCAPAI ✓":"Rp2.000.000");
+ el("kendaraan").textContent="Kendaraan: "+(s.kendaraan?"TERCAPAI ✓":"Rp750.000");
+ el("catatan").innerHTML=s.log.map(x=>"<div class='log'>"+aman(x)+"</div>").join("");
+}
+function aman(x){return String(x).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function simpan(){
+ try{localStorage.setItem("almaLifeSave",JSON.stringify(s));}
+ catch(e){alert("Penyimpanan otomatis tidak tersedia di browser ini.")}
+}
+function ulang(){
+ if(!confirm("Mulai ulang dan hapus progres permainan?"))return;
+ localStorage.removeItem("almaLifeSave");location.reload()
+}
+try{
+ let old=localStorage.getItem("almaLifeSave");
+ if(old){let v=JSON.parse(old);if(v.mulai){s=v;el("start").style.display="none";el("welcome").textContent="Halo, "+s.nama+"! Ini kisah hidupmu.";tampil()}}
+}catch(e){}
+</script>
+</body>
+  </html>
+                                                     
